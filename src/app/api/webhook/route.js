@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
-import { Client, validateSignature } from '@line/bot-sdk';
+import { messagingApi, validateSignature } from '@line/bot-sdk';
 import { addLog, updatePlant } from '@/lib/db';
 
-const config = {
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || '',
-  channelSecret: process.env.LINE_CHANNEL_SECRET || '',
-};
+const { MessagingApiClient } = messagingApi;
 
-const client = new Client(config);
+const client = new MessagingApiClient({
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN || '',
+});
+
+const channelSecret = process.env.LINE_CHANNEL_SECRET || '';
 
 export async function POST(request) {
   try {
@@ -19,7 +20,7 @@ export async function POST(request) {
     }
 
     // セキュリティ強化：LINEからの正規の通信か検証する
-    if (!validateSignature(bodyText, config.channelSecret, signature)) {
+    if (!validateSignature(bodyText, channelSecret, signature)) {
       console.error('無効な署名です。LINE以外からの不正なアクセスの可能性があります。');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
