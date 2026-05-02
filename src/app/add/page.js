@@ -17,6 +17,9 @@ export default function AddPlantPage() {
     group: '標準観葉',
     placement: '室内',
     photoFile: null,
+    isManualMode: false,
+    manualWateringDays: 14,
+    manualFertilizerDays: 30,
   });
 
   const GROUPS = [
@@ -75,6 +78,9 @@ export default function AddPlantPage() {
         placement: formData.placement,
         photoUrl: photoUrl,
         status: 'healthy', // 初期状態
+        isManualMode: formData.isManualMode,
+        manualWateringDays: formData.isManualMode ? formData.manualWateringDays : null,
+        manualFertilizerDays: formData.isManualMode ? formData.manualFertilizerDays : null,
       });
 
       // 3. ホーム画面に戻る
@@ -128,6 +134,43 @@ export default function AddPlantPage() {
               {PLACEMENTS.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
+
+          <div className={styles.formGroup} style={{ borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '1rem' }}>
+            <label className={styles.label} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={formData.isManualMode}
+                onChange={(e) => setFormData({...formData, isManualMode: e.target.checked})}
+                style={{ width: '1.2rem', height: '1.2rem' }}
+              />
+              手動モード（冬型植物など変則サイクル用）
+            </label>
+            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
+              チェックを外すと、種類と季節からアルゴリズムが自動計算します。
+            </p>
+          </div>
+
+          {formData.isManualMode && (
+            <div className={styles.formGroup} style={{ background: 'rgba(0,0,0,0.03)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+              <label className={styles.label}>水やりの間隔（日）</label>
+              <input 
+                type="number" 
+                className={styles.input} 
+                min="1" max="365"
+                value={formData.manualWateringDays}
+                onChange={(e) => setFormData({...formData, manualWateringDays: parseInt(e.target.value) || 1})}
+                style={{ marginBottom: '1rem' }}
+              />
+              <label className={styles.label}>肥料の間隔（日）</label>
+              <input 
+                type="number" 
+                className={styles.input} 
+                min="1" max="365"
+                value={formData.manualFertilizerDays}
+                onChange={(e) => setFormData({...formData, manualFertilizerDays: parseInt(e.target.value) || 1})}
+              />
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label className={styles.label}>写真</label>
