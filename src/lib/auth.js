@@ -38,13 +38,22 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     setError(null);
     const provider = new GoogleAuthProvider();
-    // 毎回アカウント選択画面を表示する（複数アカウントがある場合に便利）
     provider.setCustomParameters({ prompt: 'select_account' });
     try {
       await signInWithPopup(auth, provider);
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError('ログインに失敗しました。もう一度お試しください。');
+      console.error('Auth error:', err.code, err.message);
+      if (err.code === 'auth/popup-closed-by-user') {
+        // ユーザーが自分で閉じた場合は何もしない
+        return;
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('このドメインはFirebaseに登録されていません。Firebase Console → Authentication → 承認済みドメインに追加が必要です。');
+      } else if (err.code === 'auth/operation-not-allowed') {
+        setError('Googleサインインが有効化されていません。Firebase Console → Authentication → Sign-in method → Googleを有効にしてください。');
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('ポップアップがブロックされました。ブラウザのポップアップ許可設定を確認してください。');
+      } else {
+        setError(`ログインに失敗しました（${err.code}）。もう一度お試しください。`);
       }
     }
   };
