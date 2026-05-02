@@ -117,7 +117,7 @@ export default function Home() {
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
                 <button 
                   className={styles.actionBtn} 
-                  style={{ flex: 2 }}
+                  style={{ flex: 1 }}
                   onClick={() => handleCare(plant.id, 'water')}
                 >
                   💧 水やり
