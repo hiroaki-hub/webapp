@@ -119,8 +119,7 @@ export default function Home() {
       const { updatePlant, getPlants } = await import('@/lib/db');
       await updatePlant(editingPlant.id, {
         isManualMode: editingPlant.isManualMode,
-        manualWateringDays: editingPlant.isManualMode ? editingPlant.manualWateringDays : null,
-        manualFertilizerDays: editingPlant.isManualMode ? editingPlant.manualFertilizerDays : null,
+        manualNextWateringDays: editingPlant.isManualMode ? editingPlant.manualNextWateringDays : null,
       });
       setEditingPlant(null);
       const data = await getPlants();
@@ -230,20 +229,16 @@ export default function Home() {
               
               {editingPlant.isManualMode && (
                 <div style={{ background: '#f5f5f5', padding: '1rem', borderRadius: '8px' }}>
-                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem' }}>水やりの間隔（日）</label>
+                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem' }}>次の水やりまで（日後）</label>
                   <input 
                     type="number" min="1" max="365"
-                    value={editingPlant.manualWateringDays || 14}
-                    onChange={(e) => setEditingPlant({...editingPlant, manualWateringDays: parseInt(e.target.value) || 1})}
-                    style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                  />
-                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem' }}>肥料の間隔（日）</label>
-                  <input 
-                    type="number" min="1" max="365"
-                    value={editingPlant.manualFertilizerDays || 30}
-                    onChange={(e) => setEditingPlant({...editingPlant, manualFertilizerDays: parseInt(e.target.value) || 1})}
+                    value={editingPlant.manualNextWateringDays || 7}
+                    onChange={(e) => setEditingPlant({...editingPlant, manualNextWateringDays: parseInt(e.target.value) || 1})}
                     style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
                   />
+                  <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '0.5rem' }}>
+                    ※ 肥料のタイミングは引き続きアルゴリズムが自動判定します。
+                  </p>
                 </div>
               )}
               

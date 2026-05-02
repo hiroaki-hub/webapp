@@ -18,8 +18,7 @@ export default function AddPlantPage() {
     placement: '室内',
     photoFile: null,
     isManualMode: false,
-    manualWateringDays: 14,
-    manualFertilizerDays: 30,
+    manualNextWateringDays: 7,
   });
 
   const GROUPS = [
@@ -79,8 +78,7 @@ export default function AddPlantPage() {
         photoUrl: photoUrl,
         status: 'healthy', // 初期状態
         isManualMode: formData.isManualMode,
-        manualWateringDays: formData.isManualMode ? formData.manualWateringDays : null,
-        manualFertilizerDays: formData.isManualMode ? formData.manualFertilizerDays : null,
+        manualNextWateringDays: formData.isManualMode ? formData.manualNextWateringDays : null,
       });
 
       // 3. ホーム画面に戻る
@@ -152,23 +150,17 @@ export default function AddPlantPage() {
 
           {formData.isManualMode && (
             <div className={styles.formGroup} style={{ background: 'rgba(0,0,0,0.03)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-              <label className={styles.label}>水やりの間隔（日）</label>
+              <label className={styles.label}>次の水やりまで（日後）</label>
               <input 
                 type="number" 
                 className={styles.input} 
                 min="1" max="365"
-                value={formData.manualWateringDays}
-                onChange={(e) => setFormData({...formData, manualWateringDays: parseInt(e.target.value) || 1})}
-                style={{ marginBottom: '1rem' }}
+                value={formData.manualNextWateringDays}
+                onChange={(e) => setFormData({...formData, manualNextWateringDays: parseInt(e.target.value) || 1})}
               />
-              <label className={styles.label}>肥料の間隔（日）</label>
-              <input 
-                type="number" 
-                className={styles.input} 
-                min="1" max="365"
-                value={formData.manualFertilizerDays}
-                onChange={(e) => setFormData({...formData, manualFertilizerDays: parseInt(e.target.value) || 1})}
-              />
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
+                ※ 肥料のタイミングは引き続きアルゴリズムが自動判定します。
+              </p>
             </div>
           )}
 

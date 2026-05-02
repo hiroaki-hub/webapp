@@ -13,7 +13,7 @@ const CARE_INTERVALS = {
   water: {
     '多肉・サボテン': {
       spring_fall: { '室内': 14, '屋外': 10 },
-      summer: { '室内': 21, '屋外': 14 },
+      summer: { '室内': 21, '屋外': 21 },
       winter: { '室内': 30, '屋外': 999 }, // 999はほぼ不要（休眠）
     },
     '乾燥系観葉': {
@@ -33,7 +33,7 @@ const CARE_INTERVALS = {
     },
     '季節植物・草花': {
       spring_fall: { '室内': 3, '屋外': 2 },
-      summer: { '室内': 2, '屋外': 1 },
+      summer: { '室内': 2, '屋外': 2 },
       winter: { '室内': 7, '屋外': 999 },
     }
   },
@@ -74,16 +74,16 @@ const CARE_INTERVALS = {
  * @returns {Date | null} 次回予定日（休眠中などで不要な場合はnull）
  */
 export function calculateNextCareDate(plant, actionType, baseDate = new Date()) {
-  const isManual = plant.isManualMode || false;
   let intervalDays = 0;
 
-  if (isManual) {
-    // 手動モード
-    intervalDays = actionType === 'water' ? plant.manualWateringDays : plant.manualFertilizerDays;
-    // 手動設定がない場合はデフォルトフォールバック
-    if (!intervalDays) intervalDays = actionType === 'water' ? 7 : 30;
+  // 手動モードは「水やり」のみに適用。肥料は常に自動アルゴリズムを使用する。
+  const isManualWater = actionType === 'water' && (plant.isManualMode || false);
+
+  if (isManualWater) {
+    // 水やり手動モード: ユーザー設定の日数を使用
+    intervalDays = plant.manualNextWateringDays || 7;
   } else {
-    // 自動アルゴリズムモード
+    // 自動アルゴリズムモード（肥料は常にここ、水やりは手動OFFのみここ）
     const group = plant.group || '標準観葉';
     const placement = plant.placement || '室内';
     const season = getSeason(baseDate);
