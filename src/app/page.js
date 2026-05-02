@@ -27,7 +27,6 @@ export default function Home() {
 
   const handleCare = async (plantId, type) => {
     try {
-      // db.jsに追加した関数を呼び出す（※事前にdb.jsからaddLog, updatePlantをimportする必要があります）
       const { addLog, updatePlant, getPlants } = await import('@/lib/db');
       
       await addLog(plantId, type);
@@ -44,6 +43,10 @@ export default function Home() {
       // UIを更新
       const data = await getPlants();
       setPlants(data);
+      
+      // 成功フィードバック
+      const actionName = type === 'water' ? '水やり' : '肥料';
+      alert(`${actionName}を記録しました！`);
       
     } catch (error) {
       console.error("記録エラー:", error);
@@ -102,9 +105,14 @@ export default function Home() {
                 <span className={styles.tag}>{plant.group}</span>
                 <span className={styles.tag}>{plant.placement}</span>
               </div>
-              <p className={styles.lastAction}>
-                前回水やり: {plant.lastWateredDate ? new Date(plant.lastWateredDate.seconds * 1000).toLocaleDateString('ja-JP') : '記録なし'}
-              </p>
+              <div className={styles.lastActionContainer} style={{ marginBottom: '1.25rem', marginTop: 'auto' }}>
+                <p className={styles.lastAction} style={{ margin: 0, marginBottom: '0.25rem' }}>
+                  💧 前回水やり: {plant.lastWateredDate ? new Date(plant.lastWateredDate.seconds ? plant.lastWateredDate.seconds * 1000 : plant.lastWateredDate).toLocaleDateString('ja-JP') : '記録なし'}
+                </p>
+                <p className={styles.lastAction} style={{ margin: 0 }}>
+                  💊 前回肥料: {plant.lastFertilizedDate ? new Date(plant.lastFertilizedDate.seconds ? plant.lastFertilizedDate.seconds * 1000 : plant.lastFertilizedDate).toLocaleDateString('ja-JP') : '記録なし'}
+                </p>
+              </div>
               
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
                 <button 
