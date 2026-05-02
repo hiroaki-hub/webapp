@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Client } from '@line/bot-sdk';
+import { Client, validateSignature } from '@line/bot-sdk';
 import { addLog, updatePlant } from '@/lib/db';
 
 const config = {
@@ -16,6 +16,12 @@ export async function POST(request) {
     
     if (!signature) {
       return NextResponse.json({ error: 'No signature' }, { status: 400 });
+    }
+
+    // セキュリティ強化：LINEからの正規の通信か検証する
+    if (!validateSignature(bodyText, config.channelSecret, signature)) {
+      console.error('無効な署名です。LINE以外からの不正なアクセスの可能性があります。');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
     const body = JSON.parse(bodyText);
