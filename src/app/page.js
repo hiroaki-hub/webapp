@@ -118,6 +118,7 @@ export default function Home() {
     try {
       const { updatePlant, getPlants } = await import('@/lib/db');
       await updatePlant(editingPlant.id, {
+        placement: editingPlant.placement,
         isManualMode: editingPlant.isManualMode,
         manualNextWateringDays: editingPlant.isManualMode ? editingPlant.manualNextWateringDays : null,
       });
@@ -218,6 +219,31 @@ export default function Home() {
           <div className={styles.modalContent}>
             <h3>⚙️ 「{editingPlant.name}」の設定</h3>
             <form onSubmit={handleEditSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem' }}>置き場所</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {['室内', '屋外'].map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setEditingPlant({...editingPlant, placement: p})}
+                      style={{
+                        flex: 1, padding: '0.6rem',
+                        border: '2px solid',
+                        borderColor: editingPlant.placement === p ? 'var(--color-primary)' : '#ccc',
+                        borderRadius: '8px',
+                        background: editingPlant.placement === p ? 'rgba(16,185,129,0.1)' : 'white',
+                        color: editingPlant.placement === p ? 'var(--color-primary-dark)' : '#666',
+                        fontWeight: editingPlant.placement === p ? '700' : '400',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {p === '室内' ? '🏠 室内' : '🌳 屋外'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 

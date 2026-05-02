@@ -254,7 +254,8 @@
   top: 1rem;
   left: 1rem;
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.4rem;
   z-index: 2;
 }
 
