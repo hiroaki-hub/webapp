@@ -51,6 +51,21 @@ export default function Home() {
     }
   };
 
+  const handleDelete = async (plantId, plantName) => {
+    if (window.confirm(`「${plantName}」を本当に削除してもよろしいですか？\nこの操作は元に戻せません。`)) {
+      try {
+        const { deletePlant, getPlants } = await import('@/lib/db');
+        await deletePlant(plantId);
+        // UIを更新
+        const data = await getPlants();
+        setPlants(data);
+      } catch (error) {
+        console.error("削除エラー:", error);
+        alert("削除に失敗しました。");
+      }
+    }
+  };
+
   return (
     <div className={`animate-fade-in ${styles.dashboard}`}>
       <section className={styles.heroSection}>
@@ -68,6 +83,13 @@ export default function Home() {
         {plants.map((plant) => (
           <div key={plant.id} className={`glass-panel ${styles.card}`}>
             <div className={styles.cardImageWrapper}>
+              <button 
+                className={styles.deleteBtn}
+                onClick={() => handleDelete(plant.id, plant.name)}
+                title="削除する"
+              >
+                🗑️
+              </button>
               <img src={plant.photoUrl} alt={plant.name} className={styles.cardImage} />
               <div className={`${styles.statusBadge} ${styles[plant.status || 'healthy']}`}>
                 {plant.status === 'needs_water' ? '💧 水やり目安' : plant.status === 'warning' ? '🌿 葉水おすすめ' : '✨ 元気'}
