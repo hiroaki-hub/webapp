@@ -69,6 +69,34 @@ export default function Home() {
     }
   };
 
+  const handleDateEdit = async (plantId, type, dateStr) => {
+    if (!dateStr) return;
+    
+    const newDate = new Date(`${dateStr}T00:00:00`);
+    
+    try {
+      const { updatePlant, getPlants } = await import('@/lib/db');
+      const updateData = {};
+      if (type === 'water') {
+        updateData.lastWateredDate = newDate;
+      } else {
+        updateData.lastFertilizedDate = newDate;
+      }
+      
+      await updatePlant(plantId, updateData);
+      
+      const data = await getPlants();
+      setPlants(data);
+      
+      const actionName = type === 'water' ? '水やり' : '肥料';
+      alert(`${actionName}の日付を ${dateStr.replace(/-/g, '/')} に修正しました。`);
+      
+    } catch (error) {
+      console.error("日付の修正エラー:", error);
+      alert("日付の修正に失敗しました。");
+    }
+  };
+
   return (
     <div className={`animate-fade-in ${styles.dashboard}`}>
       <section className={styles.heroSection}>
@@ -105,13 +133,34 @@ export default function Home() {
                 <span className={styles.tag}>{plant.group}</span>
                 <span className={styles.tag}>{plant.placement}</span>
               </div>
-              <div className={styles.lastActionContainer} style={{ marginBottom: '1.25rem', marginTop: 'auto' }}>
-                <p className={styles.lastAction} style={{ margin: 0, marginBottom: '0.25rem' }}>
-                  💧 前回水やり: {plant.lastWateredDate ? new Date(plant.lastWateredDate.seconds ? plant.lastWateredDate.seconds * 1000 : plant.lastWateredDate).toLocaleDateString('ja-JP') : '記録なし'}
-                </p>
-                <p className={styles.lastAction} style={{ margin: 0 }}>
-                  💊 前回肥料: {plant.lastFertilizedDate ? new Date(plant.lastFertilizedDate.seconds ? plant.lastFertilizedDate.seconds * 1000 : plant.lastFertilizedDate).toLocaleDateString('ja-JP') : '記録なし'}
-                </p>
+              
+              <div className={styles.lastActionContainer}>
+                <div className={styles.dateRow}>
+                  <p className={styles.lastAction}>
+                    💧 前回水やり: {plant.lastWateredDate ? new Date(plant.lastWateredDate.seconds ? plant.lastWateredDate.seconds * 1000 : plant.lastWateredDate).toLocaleDateString('ja-JP') : '記録なし'}
+                  </p>
+                  <label className={styles.calendarLabel} title="水やり日を修正">
+                    📅
+                    <input 
+                      type="date" 
+                      className={styles.hiddenDateInput} 
+                      onChange={(e) => handleDateEdit(plant.id, 'water', e.target.value)}
+                    />
+                  </label>
+                </div>
+                <div className={styles.dateRow}>
+                  <p className={styles.lastAction}>
+                    💊 前回肥料: {plant.lastFertilizedDate ? new Date(plant.lastFertilizedDate.seconds ? plant.lastFertilizedDate.seconds * 1000 : plant.lastFertilizedDate).toLocaleDateString('ja-JP') : '記録なし'}
+                  </p>
+                  <label className={styles.calendarLabel} title="肥料日を修正">
+                    📅
+                    <input 
+                      type="date" 
+                      className={styles.hiddenDateInput} 
+                      onChange={(e) => handleDateEdit(plant.id, 'fertilizer', e.target.value)}
+                    />
+                  </label>
+                </div>
               </div>
               
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
