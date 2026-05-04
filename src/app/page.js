@@ -5,6 +5,14 @@ import { getPlants } from '@/lib/db';
 import { calculateNextCareDate } from '@/lib/careAlgorithm';
 import styles from './page.module.css';
 
+const GROUPS = [
+  { id: '多肉・サボテン', label: '多肉・サボテン（サボテン、エケベリアなど）' },
+  { id: '乾燥系観葉', label: '乾燥系観葉（サンスベリア、ドラセナなど）' },
+  { id: '標準観葉', label: '標準観葉（ポトス、モンステラなど）' },
+  { id: '湿潤系観葉', label: '湿潤系観葉（カラテア、シダ類など）' },
+  { id: '季節植物・草花', label: '季節植物・草花（ハーブ類など）' },
+];
+
 export default function Home() {
   const [plants, setPlants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -124,6 +132,7 @@ export default function Home() {
     try {
       const { updatePlant, getPlants } = await import('@/lib/db');
       await updatePlant(editingPlant.id, {
+        group: editingPlant.group,
         placement: editingPlant.placement,
         isManualMode: editingPlant.isManualMode,
         manualNextWateringDays: editingPlant.isManualMode ? editingPlant.manualNextWateringDays : null,
@@ -225,6 +234,19 @@ export default function Home() {
           <div className={styles.modalContent}>
             <h3>⚙️ 「{editingPlant.name}」の設定</h3>
             <form onSubmit={handleEditSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem' }}>🌿 植物のグループ（種類）</label>
+                <select
+                  value={editingPlant.group || '標準観葉'}
+                  onChange={(e) => setEditingPlant({...editingPlant, group: e.target.value})}
+                  style={{ width: '100%', padding: '0.6rem 0.8rem', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '0.9rem', background: 'white', cursor: 'pointer' }}
+                >
+                  {GROUPS.map(g => (
+                    <option key={g.id} value={g.id}>{g.label}</option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', marginBottom: '0.5rem' }}>置き場所</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
