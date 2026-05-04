@@ -9,6 +9,7 @@ export default function Home() {
   const [plants, setPlants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingPlant, setEditingPlant] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null); // { id, name }
 
   useEffect(() => {
     async function fetchPlants() {
@@ -82,17 +83,22 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async (plantId, plantName) => {
-    if (window.confirm(`「${plantName}」を本当に削除してもよろしいですか？\nこの操作は元に戻せません。`)) {
-      try {
-        const { deletePlant, getPlants } = await import('@/lib/db');
-        await deletePlant(plantId);
-        const data = await getPlants();
-        setPlants(data);
-      } catch (error) {
-        console.error("削除エラー:", error);
-        alert("削除に失敗しました。");
-      }
+  const handleDelete = (plantId, plantName) => {
+    setConfirmTarget({ id: plantId, name: plantName });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmTarget) return;
+    try {
+      const { deletePlant, getPlants } = await import('@/lib/db');
+      await deletePlant(confirmTarget.id);
+      const data = await getPlants();
+      setPlants(data);
+      setConfirmTarget(null);
+    } catch (error) {
+      console.error("削除エラー:", error);
+      alert("削除に失敗しました。");
+      setConfirmTarget(null);
     }
   };
 
@@ -273,6 +279,32 @@ export default function Home() {
                 <button type="button" onClick={() => setEditingPlant(null)} style={{ flex: 1, padding: '0.8rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>キャンセル</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {confirmTarget && (
+        <div className={styles.modalOverlay} onClick={() => setConfirmTarget(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3>🗑️ 削除の確認</h3>
+            <p style={{ margin: '1rem 0', color: 'var(--color-text-muted)' }}>
+              「<strong style={{ color: 'var(--color-text-main)' }}>{confirmTarget.name}</strong>」を本当に削除しますか？<br />
+              <span style={{ fontSize: '0.85rem' }}>この操作は元に戻せません。</span>
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+              <button
+                onClick={handleConfirmDelete}
+                style={{ flex: 1, padding: '0.8rem', background: 'var(--color-danger)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}
+              >
+                削除する
+              </button>
+              <button
+                onClick={() => setConfirmTarget(null)}
+                style={{ flex: 1, padding: '0.8rem', background: '#e5e7eb', color: '#333', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' }}
+              >
+                キャンセル
+              </button>
+            </div>
           </div>
         </div>
       )}
