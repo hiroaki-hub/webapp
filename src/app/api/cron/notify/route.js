@@ -104,7 +104,7 @@ export async function GET(request) {
             action: {
               type: 'uri',
               label: 'アプリへ',
-              uri: 'https://webapp-icgh.vercel.app/'
+              uri: 'https://webapp-ten-ruddy.vercel.app/'
             },
             flex: 2,
           },
