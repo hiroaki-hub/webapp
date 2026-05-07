@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { messagingApi, validateSignature } from '@line/bot-sdk';
-import { addLog, updatePlant } from '@/lib/db';
+import { addLog, updatePlant } from '@/lib/db-server';
 
 const { MessagingApiClient } = messagingApi;
 

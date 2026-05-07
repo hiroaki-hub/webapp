@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { messagingApi } from '@line/bot-sdk';
-import { getPlants } from '@/lib/db';
+import { getPlants } from '@/lib/db-server';
 import { calculateNextCareDate } from '@/lib/careAlgorithm';
 
 const { MessagingApiClient } = messagingApi;
