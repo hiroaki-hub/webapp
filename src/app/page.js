@@ -20,6 +20,7 @@ export default function Home() {
   const [confirmTarget, setConfirmTarget] = useState(null); // { id, name }
   const [statusFilter, setStatusFilter] = useState('all'); // all, water, fertilizer
   const [placementFilter, setPlacementFilter] = useState('all'); // all, 室内, 屋外
+  const [expandedCards, setExpandedCards] = useState({}); // { [id]: boolean }
 
   useEffect(() => {
     async function fetchPlants() {
@@ -140,6 +141,10 @@ export default function Home() {
     setConfirmTarget({ id: plantId, name: plantName });
   };
 
+  const toggleCard = (id) => {
+    setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const handleConfirmDelete = async () => {
     if (!confirmTarget) return;
     try {
@@ -249,28 +254,35 @@ export default function Home() {
               </div>
             </div>
             
-            <div className={styles.cardContent}>
-              <h3 className={styles.plantName}>{plant.name}</h3>
+            <div className={styles.cardContent} onClick={() => toggleCard(plant.id)} style={{ cursor: 'pointer' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <h3 className={styles.plantName}>{plant.name}</h3>
+                <span style={{ fontSize: '0.75rem', color: '#999', padding: '0.2rem 0', whiteSpace: 'nowrap' }}>
+                  {expandedCards[plant.id] ? '▲ 閉じる' : '▼ 詳細'}
+                </span>
+              </div>
               <div className={styles.tags}>
                 <span className={styles.tag}>{plant.group}</span>
                 <span className={styles.tag}>{plant.placement}</span>
                 {plant.isManualMode && <span className={styles.tag} style={{background:'#fff3cd', color:'#856404', borderColor:'#ffeeba'}}>手動モード</span>}
               </div>
               
-              <div className={styles.lastActionContainer}>
-                <div className={styles.dateRow}>
-                  <p className={styles.lastAction}>
-                    💧 前回水やり: {plant.lastWateredDate ? new Date(plant.lastWateredDate.seconds ? plant.lastWateredDate.seconds * 1000 : plant.lastWateredDate).toLocaleDateString('ja-JP') : '記録なし'}
-                  </p>
-                  <label className={styles.calendarLabel} title="水やり日を修正">📅<input type="date" className={styles.hiddenDateInput} onChange={(e) => handleDateEdit(plant.id, 'water', e.target.value)} /></label>
+              {expandedCards[plant.id] && (
+                <div className={styles.lastActionContainer} onClick={(e) => e.stopPropagation()}>
+                  <div className={styles.dateRow}>
+                    <p className={styles.lastAction}>
+                      💧 前回水やり: {plant.lastWateredDate ? new Date(plant.lastWateredDate.seconds ? plant.lastWateredDate.seconds * 1000 : plant.lastWateredDate).toLocaleDateString('ja-JP') : '記録なし'}
+                    </p>
+                    <label className={styles.calendarLabel} title="水やり日を修正">📅<input type="date" className={styles.hiddenDateInput} onChange={(e) => handleDateEdit(plant.id, 'water', e.target.value)} /></label>
+                  </div>
+                  <div className={styles.dateRow}>
+                    <p className={styles.lastAction}>
+                      💊 前回肥料: {plant.lastFertilizedDate ? new Date(plant.lastFertilizedDate.seconds ? plant.lastFertilizedDate.seconds * 1000 : plant.lastFertilizedDate).toLocaleDateString('ja-JP') : '記録なし'}
+                    </p>
+                    <label className={styles.calendarLabel} title="肥料日を修正">📅<input type="date" className={styles.hiddenDateInput} onChange={(e) => handleDateEdit(plant.id, 'fertilizer', e.target.value)} /></label>
+                  </div>
                 </div>
-                <div className={styles.dateRow}>
-                  <p className={styles.lastAction}>
-                    💊 前回肥料: {plant.lastFertilizedDate ? new Date(plant.lastFertilizedDate.seconds ? plant.lastFertilizedDate.seconds * 1000 : plant.lastFertilizedDate).toLocaleDateString('ja-JP') : '記録なし'}
-                  </p>
-                  <label className={styles.calendarLabel} title="肥料日を修正">📅<input type="date" className={styles.hiddenDateInput} onChange={(e) => handleDateEdit(plant.id, 'fertilizer', e.target.value)} /></label>
-                </div>
-              </div>
+              )}
 
               <div className={styles.nextActionContainer}>
                 <p className={styles.nextAction}>
@@ -281,7 +293,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.actionBtn} style={{ flex: 1 }} onClick={() => handleCare(plant.id, 'water')}>💧 水やり</button>
                 <button className={styles.actionBtn} style={{ flex: 1, backgroundColor: 'var(--color-text-muted)' }} onClick={() => handleCare(plant.id, 'fertilizer')}>💊 肥料</button>
               </div>
