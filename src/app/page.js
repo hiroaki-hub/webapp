@@ -33,8 +33,10 @@ export default function Home() {
     fetchPlants();
   }, []);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // JST(日本時間)を基準にした「今日」の0時0分0秒を取得
+  const now = new Date();
+  const jstTime = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const today = new Date(jstTime.getUTCFullYear(), jstTime.getUTCMonth(), jstTime.getUTCDate());
 
   let needsWaterCount = 0;
   let needsFertilizerCount = 0;

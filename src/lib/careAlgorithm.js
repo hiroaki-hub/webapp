@@ -96,9 +96,11 @@ export function calculateNextCareDate(plant, actionType, baseDate = new Date()) 
   // 999日以上の場合は「休眠中/不要」として扱う
   if (intervalDays >= 999) return null;
 
-  const nextDate = new Date(baseDate);
-  nextDate.setDate(nextDate.getDate() + parseInt(intervalDays, 10));
-  nextDate.setHours(0, 0, 0, 0); // 時間はリセット
+  // baseDateをJSTに変換して計算する
+  const jstBase = new Date(baseDate.getTime() + 9 * 60 * 60 * 1000);
+  
+  // JSTの年月日に日数を足す。時間は0時にリセット。
+  const nextDate = new Date(jstBase.getUTCFullYear(), jstBase.getUTCMonth(), jstBase.getUTCDate() + parseInt(intervalDays, 10));
   
   return nextDate;
 }
