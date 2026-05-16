@@ -297,3 +297,98 @@
   max-width: 400px;
   box-shadow: var(--shadow-lg);
 }
+
+/* フィルターUIのスタイル */
+.filterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.filterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filterLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: 0.2rem;
+}
+
+.filterBtn {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: white;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.filterBtn:hover {
+  background: var(--color-bg);
+}
+
+.filterBtn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* スマホ用の最適化 */
+@media (max-width: 768px) {
+  .dashboard {
+    gap: 1rem;
+  }
+
+  .heroSection {
+    padding: 1.25rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .grid {
+    gap: 1rem;
+    grid-template-columns: 1fr; /* スマホでは確実に1列にする */
+  }
+
+  .cardImageWrapper {
+    height: 140px; /* 画像の高さを抑える */
+  }
+
+  .cardContent {
+    padding: 1rem; /* パディングを狭くする */
+  }
+
+  .plantName {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tags {
+    margin-bottom: 0.5rem;
+  }
+
+  .lastActionContainer {
+    margin-bottom: 0.75rem;
+  }
+
+  .nextActionContainer {
+    margin-bottom: 0.75rem;
+    padding: 0.4rem;
+  }
+}
+

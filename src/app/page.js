@@ -18,6 +18,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [editingPlant, setEditingPlant] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null); // { id, name }
+  const [statusFilter, setStatusFilter] = useState('all'); // all, water, fertilizer
+  const [placementFilter, setPlacementFilter] = useState('all'); // all, 室内, 屋外
 
   useEffect(() => {
     async function fetchPlants() {
@@ -64,6 +66,47 @@ export default function Home() {
     }
     
     return { ...plant, nextWateringDate: nextWater, nextFertilizerDate: nextFert };
+  });
+
+  // フィルター処理
+  let displayPlants = enrichedPlants.filter(plant => {
+    // 状態フィルター
+    if (statusFilter === 'water') {
+      // 未記録なら水やり必要
+      if (!plant.lastWateredDate) return true;
+      // 休眠期などで不要な場合を除外
+      if (!plant.nextWateringDate) return false;
+      // 今日より後の場合は除外
+      if (plant.nextWateringDate > today) return false;
+    }
+    if (statusFilter === 'fertilizer') {
+      if (!plant.lastFertilizedDate && plant.nextFertilizerDate && plant.nextFertilizerDate <= today) return true;
+      if (plant.lastFertilizedDate && !plant.nextFertilizerDate) return false;
+      if (plant.nextFertilizerDate && plant.nextFertilizerDate > today) return false;
+    }
+    
+    // 置き場所フィルター
+    if (placementFilter !== 'all') {
+      if (plant.placement !== placementFilter) return false;
+    }
+    
+    return true;
+  });
+
+  // ソート処理（次回水やりが近い順）
+  displayPlants.sort((a, b) => {
+    // 1. 未記録（lastWateredDateがない）を最優先
+    if (!a.lastWateredDate && b.lastWateredDate) return -1;
+    if (a.lastWateredDate && !b.lastWateredDate) return 1;
+    if (!a.lastWateredDate && !b.lastWateredDate) return 0;
+    
+    // 2. 次回予定日がない（休眠等）は一番最後にする
+    if (!a.nextWateringDate && b.nextWateringDate) return 1;
+    if (a.nextWateringDate && !b.nextWateringDate) return -1;
+    if (!a.nextWateringDate && !b.nextWateringDate) return 0;
+    
+    // 3. 予定日が古い（過去＝過ぎている・近い）順
+    return a.nextWateringDate.getTime() - b.nextWateringDate.getTime();
   });
 
   const handleCare = async (plantId, type) => {
@@ -164,8 +207,24 @@ export default function Home() {
         )}
       </section>
 
+      {/* フィルターUI */}
+      <div className={styles.filterContainer}>
+        <div className={styles.filterGroup}>
+          <span className={styles.filterLabel}>お世話:</span>
+          <button className={`${styles.filterBtn} ${statusFilter === 'all' ? styles.active : ''}`} onClick={() => setStatusFilter('all')}>すべて</button>
+          <button className={`${styles.filterBtn} ${statusFilter === 'water' ? styles.active : ''}`} onClick={() => setStatusFilter('water')}>💧 水やり必要</button>
+          <button className={`${styles.filterBtn} ${statusFilter === 'fertilizer' ? styles.active : ''}`} onClick={() => setStatusFilter('fertilizer')}>💊 肥料必要</button>
+        </div>
+        <div className={styles.filterGroup}>
+          <span className={styles.filterLabel}>置き場所:</span>
+          <button className={`${styles.filterBtn} ${placementFilter === 'all' ? styles.active : ''}`} onClick={() => setPlacementFilter('all')}>すべて</button>
+          <button className={`${styles.filterBtn} ${placementFilter === '室内' ? styles.active : ''}`} onClick={() => setPlacementFilter('室内')}>🏠 室内</button>
+          <button className={`${styles.filterBtn} ${placementFilter === '屋外' ? styles.active : ''}`} onClick={() => setPlacementFilter('屋外')}>🌳 屋外</button>
+        </div>
+      </div>
+
       <div className={styles.grid}>
-        {enrichedPlants.map((plant) => (
+        {displayPlants.map((plant) => (
           <div key={plant.id} className={`glass-panel ${styles.card}`}>
             <div className={styles.cardImageWrapper}>
               <div className={styles.cardHeaderActions}>
